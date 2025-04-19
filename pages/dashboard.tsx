@@ -1,1 +1,4 @@
-// user dashboard with subscription info
+export default function DashboardPage() {
+    return <div>Coming soon: Dashboard</div>;
+  }
+  
