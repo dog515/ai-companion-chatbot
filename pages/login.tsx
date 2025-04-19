@@ -1,34 +1,31 @@
-import { getProviders, signIn } from 'next-auth/react';
-import { useEffect, useState } from 'react';
+import { getProviders, signIn, useSession } from 'next-auth/react';
 
 export default function LoginPage() {
-  const [providers, setProviders] = useState<any>(null); // <-- this is the missing part
+  const { data: session } = useSession();
 
-  useEffect(() => {
-    getProviders().then((prov) => setProviders(prov));
-  }, []);
+  if (session) {
+    return (
+      <div style={{ textAlign: 'center', padding: '4rem' }}>
+        <h1>Welcome, {session.user?.name} 👋</h1>
+        <p>You are logged in as <strong>{session.user?.email}</strong></p>
+        <img
+          src={session.user?.image ?? ''}
+          alt="Profile"
+          style={{ borderRadius: '50%', width: 64, height: 64, marginTop: '1rem' }}
+        />
+        <br />
+        <button onClick={() => signOut()} style={{ marginTop: '2rem' }}>
+          Log out
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ padding: '4rem', textAlign: 'center' }}>
+    <div style={{ textAlign: 'center', padding: '4rem' }}>
       <h1>Login</h1>
-      {providers ? (
-        Object.values(providers).map((provider: any) => (
-          <div key={provider.name} style={{ marginTop: '1rem' }}>
-            <button
-              onClick={() => signIn(provider.id)}
-              style={{
-                padding: '0.75rem 1.5rem',
-                fontSize: '1rem',
-                cursor: 'pointer',
-              }}
-            >
-              Sign in with {provider.name}
-            </button>
-          </div>
-        ))
-      ) : (
-        <p>Loading login providers...</p>
-      )}
+      <button onClick={() => signIn('google')}>Sign in with Google</button>
     </div>
   );
 }
+
