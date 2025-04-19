@@ -2,7 +2,7 @@ import { getProviders, signIn } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 
 export default function LoginPage() {
-  const [providers, setProviders] = useState<any>(null);
+  const [providers, setProviders] = useState<any>(null); // <-- this is the missing part
 
   useEffect(() => {
     getProviders().then((prov) => setProviders(prov));
