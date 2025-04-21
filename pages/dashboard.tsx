@@ -19,19 +19,19 @@ export default function Dashboard() {
       <p>You are logged in as <strong>{session?.user?.email}</strong></p>
 
      {/* Stripe Checkout Buttons */}
-    <button
-      onClick={() => startCheckout('price_1RFtEGELZxyuzW7jBV56cm1v', 'subscription')}
-      style={{ margin: '1rem' }}
-    >
- Subscribe for $18/month
- </button>
+     <button
+  onClick={() => startCheckout('price_1RFtCAELZxyuzW7jI8fqZ7pZ', 'subscription')}
+  style={{ margin: '1rem' }}
+>
+  Subscribe for $18/month
+</button>
 
- <button
-      onClick={() => startCheckout('price_1RFtCAELZxyuzW7jI8fq7pZ', 'payment')}
-      style={{ margin: '1rem' }}
-    >
-      Pay $40 to Create Your Own Bot
-    </button>
+<button
+  onClick={() => startCheckout('price_1RFtEGELZxyuzW7jBVS6cm1v', 'payment')}
+  style={{ margin: '1rem' }}
+>
+  Pay $40 to Create Your Own Bot
+</button>
 
 <br />
 <img
