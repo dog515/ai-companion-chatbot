@@ -4,7 +4,7 @@ import Stripe from 'stripe';
 
 export const config = {
   api: {
-    bodyParser: false, // required to read raw body
+    bodyParser: false, // critical for using `buffer()`
   },
 };
 
@@ -19,31 +19,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).send('Method Not Allowed');
   }
 
-  const buf = await buffer(req);
-  const sig = req.headers['stripe-signature'] as string;
-
-  let event: Stripe.Event;
+  let event;
 
   try {
+    const buf = await buffer(req);
+    const sig = req.headers['stripe-signature'] as string;
+
     event = stripe.webhooks.constructEvent(buf, sig, webhookSecret);
   } catch (err: any) {
-    console.error('Webhook signature verification failed:', err.message);
+    console.error('❌ Webhook Error:', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  // Handle event
+  console.log('✅ Webhook received:', event.type);
+
   switch (event.type) {
     case 'checkout.session.completed':
-      const session = event.data.object as Stripe.Checkout.Session;
-      console.log('✅ Checkout completed session:', session);
+      const session = event.data.object;
+      console.log('🔔 Checkout session completed:', session);
+      // Add your logic here (DB update, email, etc.)
       break;
 
-    case 'customer.subscription.created':
-      const subscription = event.data.object as Stripe.Subscription;
-      console.log('✅ Subscription created:', subscription.id);
-      break;
-
-    // Add more event types if needed
     default:
       console.log(`Unhandled event type: ${event.type}`);
   }
