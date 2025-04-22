@@ -4,17 +4,19 @@ import Stripe from 'stripe';
 
 export const config = {
   api: {
-    bodyParser: false, // ✅ Required to read the raw request body for Stripe signature verification
+    bodyParser: false, // required to read raw body
   },
 };
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: '2022-11-15',
 });
 
-const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET as string;
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
-    return res.status(405).end('Method Not Allowed');
+    return res.status(405).send('Method Not Allowed');
   }
 
   const buf = await buffer(req);
@@ -23,40 +25,28 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(
-      buf,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET!
-    );
+    event = stripe.webhooks.constructEvent(buf, sig, webhookSecret);
   } catch (err: any) {
-    console.error('❌ Webhook signature verification failed:', err.message);
+    console.error('Webhook signature verification failed:', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  // ✅ Handle events from Stripe
+  // Handle event
   switch (event.type) {
     case 'checkout.session.completed':
       const session = event.data.object as Stripe.Checkout.Session;
-      console.log('✅ Checkout session completed:', session.id);
-      // You can add custom logic here, e.g. update user subscription in DB
-      break;
-
-    case 'invoice.payment_succeeded':
-      console.log('✅ Payment succeeded:', event.data.object);
+      console.log('✅ Checkout completed session:', session);
       break;
 
     case 'customer.subscription.created':
-      console.log('✅ Subscription created:', event.data.object);
+      const subscription = event.data.object as Stripe.Subscription;
+      console.log('✅ Subscription created:', subscription.id);
       break;
 
-    // Add other cases if needed
-
+    // Add more event types if needed
     default:
       console.log(`Unhandled event type: ${event.type}`);
   }
 
   res.status(200).json({ received: true });
-};
-
-export default webhookHandler;
-
+}
