@@ -1,4 +1,4 @@
-import { useSubscriptions } from '@/lib/hooks/useSubscriptions';
+import { useSubscriptions } from '@/lib/hooks/useSubscription';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -7,7 +7,7 @@ const { subscriptions, loading } = useSubscriptions();
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('subscriptions');
-  const { subscriptions, isLoading, isError } = useSubscriptions(); // 
+  const { subscriptions, loading: isLoading, error: isError } = useSubscriptions();
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
