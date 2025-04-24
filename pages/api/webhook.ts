@@ -44,11 +44,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         update: {
           status: subscription.status,
           stripePriceId: subscription.items.data[0].price.id,
+          currentPeriodEnd: new Date(subscription.current_period_end * 1000), // 
         },
         create: {
           stripeSubscriptionId: subscription.id,
           stripeCustomerId: subscription.customer as string,
           stripePriceId: subscription.items.data[0].price.id,
+          currentPeriodEnd: new Date(subscription.current_period_end * 1000), // 
           status: subscription.status,
           user: {
             connect: {

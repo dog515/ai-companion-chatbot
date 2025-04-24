@@ -1,27 +1,45 @@
-// lib/hooks/useSubscription.ts
-
+// lib/hooks/useSubscriptions.ts
 import { useEffect, useState } from 'react';
 
-export function useSubscription() {
-  const [subscription, setSubscription] = useState<any>(null);
+export type Subscription = {
+  id: string;
+  stripeSubscriptionId: string;
+  stripeCustomerId: string;
+  stripePriceId: string;
+  status: string;
+  currentPeriodEnd: string;
+  createdAt: string;
+  updatedAt: string;
+  user: {
+    id: string;
+    email: string;
+    name?: string | null;
+  };
+};
+
+export function useSubscriptions() {
+  const [subscriptions, setSubscriptions] = useState<Subscription[] | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    async function fetchSubscription() {
+    async function fetchSubscriptions() {
       try {
-        const res = await fetch('/api/user/subscription');
+        const res = await fetch('/api/admin/subscriptions');
+        if (!res.ok) {
+          throw new Error('Failed to fetch subscriptions');
+        }
         const data = await res.json();
-        setSubscription(data.subscription ?? null);
+        setSubscriptions(data);
       } catch (err) {
-        console.error('Failed to fetch subscription:', err);
-        setSubscription(null);
+        setError(err as Error);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchSubscription();
+    fetchSubscriptions();
   }, []);
 
-  return { subscription, loading };
+  return { subscriptions, loading, error };
 }

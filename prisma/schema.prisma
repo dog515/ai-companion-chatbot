@@ -1,5 +1,3 @@
-// prisma/schema.prisma
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,19 +8,25 @@ datasource db {
 }
 
 model User {
-  id                 String        @id @default(cuid())
-  email              String        @unique
-  stripeCustomerId   String        @unique
-  subscriptions      Subscription[]
+  id            String         @id @default(cuid())
+  email         String         @unique
+  stripeCustomerId  String?         @unique  //
+  name          String?
+  subscriptions Subscription[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 }
 
-
 model Subscription {
-  id                  String   @id @default(cuid())
-  stripeSubscriptionId String   @unique
-  stripeCustomerId     String
-  stripePriceId        String
-  status               String
-  userId               String
-  user                 User     @relation(fields: [userId], references: [id])
+  id                    String   @id @default(cuid())
+  userId                String
+  stripeCustomerId      String   @unique
+  stripeSubscriptionId  String   @unique
+  stripePriceId        String   //
+  currentPeriodEnd      DateTime
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  status               String   @default("active") // 
+
+  user User @relation(fields: [userId], references: [id])
 }
