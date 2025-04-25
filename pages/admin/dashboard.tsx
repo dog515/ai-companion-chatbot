@@ -1,12 +1,33 @@
+import { useEffect, useState } from 'react';
+import { getSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/react';
 import { useSubscriptions } from '@/lib/hooks/useSubscription';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { useState } from 'react';
 
 export default function AdminDashboard() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('subscriptions');
-  const { data: subscriptions, isLoading, error: isError } = useSubscriptions();
+  const { data: session, status } = useSession();
+  useEffect(() => {
+    if (status === 'loading') return; // wait for session to load
+    if (!session) {
+      router.push('/api/auth/signin');
+    }
+  }, [session, status]);
+  // 🔒 Redirect to login if not logged in
+  useEffect(() => {
+    getSession().then(session => {
+      if (!session) {
+        router.push('/login');
+      }
+    });
+  }, [router]);
+
+  const { data: subscriptions, isLoading, error } = useSubscriptions();
+
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
@@ -19,31 +40,32 @@ export default function AdminDashboard() {
         </TabsList>
 
         <TabsContent value="subscriptions">
-  <Card>
-    <CardContent className="p-4">
-      <h2 className="text-xl font-semibold mb-2">All Active Subscriptions</h2>
-      <p className="text-muted-foreground mb-2">View and manage current subscriptions.</p>
+          <Card>
+            <CardContent className="p-4">
+              <h2 className="text-xl font-semibold mb-2">All Active Subscriptions</h2>
+              <p className="text-muted-foreground mb-4">View and manage current subscriptions.</p>
 
-      {isLoading && <p>Loading subscriptions...</p>}
-      {isError && <p className="text-red-500">Failed to load subscriptions.</p>}
-      {!isLoading && !isError && subscriptions.length === 0 && (
-        <p className="text-muted-foreground">No active subscriptions found.</p>
-      )}
-      {!isLoading && !isError && subscriptions.length > 0 && (
-        <ul className="space-y-2 mt-4">
-          {subscriptions.map((sub: any) => (
-            <li key={sub.id} className="border rounded p-3">
-              <div><strong>Email:</strong> {sub.user?.email}</div>
-              <div><strong>Status:</strong> {sub.status}</div>
-              <div><strong>Plan:</strong> {sub.stripePriceId}</div>
-              <div><strong>Next Billing:</strong> {new Date(sub.currentPeriodEnd).toLocaleDateString()}</div>
-            </li>
-          ))}
-        </ul>
-      )}
-    </CardContent>
-  </Card>
-</TabsContent>
+              {isLoading ? (
+                <p>Loading subscriptions...</p>
+              ) : error ? (
+                <p className="text-red-500">Failed to load subscriptions.</p>
+              ) : subscriptions?.length === 0 ? (
+                <p>No active subscriptions found.</p>
+              ) : (
+                <ul className="space-y-2">
+                  {subscriptions.map((sub) => (
+                    <li key={sub.id} className="border rounded p-2">
+                      <div><strong>User:</strong> {sub.user.email}</div>
+                      <div><strong>Status:</strong> {sub.status}</div>
+                      <div><strong>Price ID:</strong> {sub.stripePriceId}</div>
+                      <div><strong>Renews:</strong> {new Date(sub.currentPeriodEnd).toLocaleDateString()}</div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="users">
           <Card>
