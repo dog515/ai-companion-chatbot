@@ -1,5 +1,5 @@
 // lib/hooks/useSubscriptions.ts
-import { useEffect, useState } from 'react';
+import useSWR from 'swr';
 
 export type Subscription = {
   id: string;
@@ -13,33 +13,15 @@ export type Subscription = {
   user: {
     id: string;
     email: string;
-    name?: string | null;
   };
 };
 
+const fetcher = (url: string) => fetch(url).then((res) => {
+  if (!res.ok) throw new Error('Failed to fetch subscriptions');
+  return res.json();
+});
+
 export function useSubscriptions() {
-  const [subscriptions, setSubscriptions] = useState<Subscription[] | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  useEffect(() => {
-    async function fetchSubscriptions() {
-      try {
-        const res = await fetch('/api/admin/subscriptions');
-        if (!res.ok) {
-          throw new Error('Failed to fetch subscriptions');
-        }
-        const data = await res.json();
-        setSubscriptions(data);
-      } catch (err) {
-        setError(err as Error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchSubscriptions();
-  }, []);
-
-  return { subscriptions, loading, error };
+  const { data, error, isLoading } = useSWR<Subscription[]>('/api/admin/subscriptions', fetcher);
+  return { data, error, isLoading };
 }
