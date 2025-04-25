@@ -6,8 +6,7 @@ import { useState } from 'react';
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('subscriptions');
-  const { subscriptions, loading: isLoading, error: isError } = useSubscriptions();
-
+  const { data: subscriptions, isLoading, error: isError } = useSubscriptions();
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
