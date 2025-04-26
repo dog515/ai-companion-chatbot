@@ -9,6 +9,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { SubscriptionsTable } from '@/components/admin/SubscriptionsTable';
 import { SubscriptionWithUser } from '@/types';
 
+
 export default function AdminDashboard() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('subscriptions');
@@ -18,14 +19,18 @@ export default function AdminDashboard() {
   useEffect(() => {
     const checkAuth = async () => {
       if (status === 'loading') return;
+      
       const session = await getSession();
+      console.log('Session:', session); // Add for debugging
       
       if (!session) {
-        router.push('/login'); // Make sure this matches your login route
+        router.push('/login');
       } else if (session.user?.email !== process.env.ADMIN_EMAIL) {
-        router.push('/unauthorized'); // Create this page
+        console.log('Unauthorized email:', session.user?.email); // Debug email mismatch
+        router.push('/unauthorized');
       }
     };
+    
     checkAuth();
   }, [router, status]);
 

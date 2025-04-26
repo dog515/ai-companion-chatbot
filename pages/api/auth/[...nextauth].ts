@@ -1,11 +1,12 @@
-import NextAuth from 'next-auth';
-import GoogleProvider from 'next-auth/providers/google';
+// pages/api/auth/[...nextauth].ts
+import NextAuth from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
 
 export const authOptions = {
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!, // ✅ Matches your .env
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!, // ✅ Matches your .env
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,

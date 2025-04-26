@@ -6,8 +6,10 @@ import { SubscriptionWithUser } from '@/types';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions);
+  console.log('API Session:', session); // Debug session
 
   if (!session || session.user?.email !== process.env.ADMIN_EMAIL) {
+    console.log('Unauthorized API access attempt from:', session?.user?.email);
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
