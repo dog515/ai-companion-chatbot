@@ -20,22 +20,22 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      if (status === 'loading') return;
-      
       const session = await getSession();
-      console.log('Session:', session); // Add for debugging
+      
+      // Case-insensitive email comparison
+      const isAdmin = session?.user?.email?.toLowerCase() === process.env.ADMIN_EMAIL?.toLowerCase();
       
       if (!session) {
         router.push('/login');
-      } else if (session.user?.email !== process.env.ADMIN_EMAIL) {
-        console.log('Unauthorized email:', session.user?.email); // Debug email mismatch
+      } else if (!isAdmin) {
+        console.log(`Access denied. Logged in as: ${session.user?.email}`);
         router.push('/unauthorized');
       }
     };
     
     checkAuth();
-  }, [router, status]);
-
+  }, [router]);
+  
   if (status === 'loading') return <div>Loading...</div>;
 
   return (
