@@ -1,5 +1,6 @@
 // lib/hooks/useSubscriptions.ts
 import useSWR from 'swr';
+import { SubscriptionWithUser } from '@/types';
 
 export type Subscription = {
   id: string;
@@ -16,12 +17,23 @@ export type Subscription = {
   };
 };
 
-const fetcher = (url: string) => fetch(url).then((res) => {
-  if (!res.ok) throw new Error('Failed to fetch subscriptions');
+const fetcher = (url: string) => fetch(url).then(async (res) => {
+  if (!res.ok) {
+    const error = new Error('Failed to fetch subscriptions');
+    const errorData = await res.json();
+    error.message = errorData.error || error.message;
+    throw error;
+  }
   return res.json();
 });
-
 export function useSubscriptions() {
-  const { data, error, isLoading } = useSWR<Subscription[]>('/api/admin/subscriptions', fetcher);
-  return { data, error, isLoading };
+  const { data, error, isLoading } = useSWR<SubscriptionWithUser[]>('/api/admin/subscriptions', fetcher);
+  
+  return {
+    data: data || [],
+    isLoading,
+    error: error?.message
+  };
 }
+
+
