@@ -19,8 +19,11 @@ export default function AdminDashboard() {
     const checkAuth = async () => {
       if (status === 'loading') return;
       const session = await getSession();
+      
       if (!session) {
-        router.push('/login');
+        router.push('/login'); // Make sure this matches your login route
+      } else if (session.user?.email !== process.env.ADMIN_EMAIL) {
+        router.push('/unauthorized'); // Create this page
       }
     };
     checkAuth();
