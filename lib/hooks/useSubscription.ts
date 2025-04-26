@@ -27,7 +27,7 @@ const fetcher = (url: string) => fetch(url).then(async (res) => {
   return res.json();
 });
 export function useSubscriptions() {
-  const { data, error, isLoading } = useSWR<SubscriptionWithUser[]>('/api/admin/subscriptions', fetcher);
+  const { data, error, isLoading } = useSWR<SubscriptionWithUser[]>('/api/subscriptions', fetcher);
   
   return {
     data: data || [],

@@ -15,6 +15,8 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('subscriptions');
   const { data: session, status } = useSession();
   const { data: subscriptions, isLoading, error } = useSubscriptions();
+  
+
 
   useEffect(() => {
     const checkAuth = async () => {
