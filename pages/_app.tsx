@@ -1,17 +1,11 @@
 // pages/_app.tsx
-import { SessionProvider } from "next-auth/react";
-import { AppProps } from "next/app";
+import { SessionProvider } from 'next-auth/react';
+import type { AppProps } from 'next/app';
 
-function MyApp({ Component, pageProps }: AppProps) {
+export default function App({ Component, pageProps }: AppProps) {
   return (
-    <SessionProvider 
-      session={pageProps.session}
-      refetchInterval={5 * 60} // Refresh session every 5 minutes
-      refetchOnWindowFocus={true}
-    >
+    <SessionProvider session={pageProps.session}>
       <Component {...pageProps} />
     </SessionProvider>
   );
 }
-
-export default MyApp;
